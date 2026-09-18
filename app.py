@@ -215,19 +215,51 @@ st.markdown("""
     }
 
     /* ─── Styled Inputs ─── */
-    .stNumberInput > div > div > input,
-    .stDateInput > div > div > input {
+    .stNumberInput input,
+    .stDateInput input {
         background: rgba(22, 27, 34, 0.8) !important;
         border: 1px solid rgba(48, 54, 61, 0.8) !important;
         border-radius: 10px !important;
         color: #e6edf3 !important;
         font-family: 'JetBrains Mono', monospace !important;
     }
-    .stNumberInput > div > div > input:focus,
-    .stDateInput > div > div > input:focus {
+    .stNumberInput input:focus,
+    .stDateInput input:focus {
         border-color: rgba(247,147,26,0.5) !important;
         box-shadow: 0 0 0 2px rgba(247,147,26,0.1) !important;
     }
+
+    /* ─── Date Input Fix ─── */
+    .stDateInput [data-baseweb="input"] {
+        background: rgba(22, 27, 34, 0.8) !important;
+        border-color: rgba(48, 54, 61, 0.8) !important;
+        border-radius: 10px !important;
+    }
+    .stDateInput [data-baseweb="input"] input {
+        color: #e6edf3 !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        caret-color: #F7931A !important;
+    }
+    /* Date picker popover */
+    [data-baseweb="calendar"] {
+        background: #161b22 !important;
+        color: #e6edf3 !important;
+    }
+    [data-baseweb="calendar"] div {
+        color: #e6edf3 !important;
+    }
+    [data-baseweb="calendar"] button {
+        color: #e6edf3 !important;
+    }
+    [data-baseweb="calendar"] button:hover {
+        background: rgba(247,147,26,0.2) !important;
+    }
+    [data-baseweb="popover"] > div {
+        background: #161b22 !important;
+        border: 1px solid rgba(247,147,26,0.2) !important;
+        border-radius: 12px !important;
+    }
+
     .stSlider > div > div > div > div {
         background-color: #F7931A !important;
     }
