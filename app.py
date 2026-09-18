@@ -1,6 +1,5 @@
 import streamlit as st
 import numpy as np
-import tensorflow as tf
 import joblib
 import json
 from datetime import datetime
@@ -296,10 +295,35 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── Load Model & Artifacts (cached) ─────────────────────────────────────────
+# ── Pure NumPy ANN Inference ─────────────────────────────────────────────────
+def relu(x):
+    return np.maximum(0, x)
+
+def predict_numpy(weights_data, config, input_array):
+    """Run ANN forward pass using pure NumPy — no TensorFlow needed!"""
+    x = input_array.astype(np.float32)
+    num_layers = len(config)
+    for i in range(num_layers):
+        w_key = f"w{i}"
+        b_key = f"b{i}"
+        if w_key in weights_data and b_key in weights_data:
+            w = weights_data[w_key]
+            b = weights_data[b_key]
+            x = x @ w + b
+            if config[i]["activation"] == "relu":
+                x = relu(x)
+    return x
+
+# ── Load Artifacts (cached) ─────────────────────────────────────────────────
 @st.cache_resource
-def load_model():
-    return tf.keras.models.load_model("btc_model.keras")
+def load_model_weights():
+    data = np.load("btc_model_weights.npz")
+    return dict(data)
+
+@st.cache_resource
+def load_model_config():
+    with open("model_config.json") as f:
+        return json.load(f)
 
 @st.cache_resource
 def load_scalers():
@@ -312,7 +336,8 @@ def load_features():
     with open("features.json") as f:
         return json.load(f)
 
-model = load_model()
+weights_data = load_model_weights()
+model_config = load_model_config()
 scaler_X, scaler_y = load_scalers()
 features = load_features()
 
@@ -384,7 +409,7 @@ with col_right:
     with d1:
         input_date = st.date_input("Select Date", value=datetime.today())
     with d2:
-        input_hour = st.slider("Hour (0–23)", min_value=0, max_value=23, value=12)
+        input_hour = st.slider("Hour (0-23)", min_value=0, max_value=23, value=12)
 
     # Derived features
     day = input_date.day
@@ -430,9 +455,9 @@ if predict_clicked:
         input_array = np.array([[open_price, high_price, low_price, volume,
                                   input_hour, day, weekday, month, is_weekend]])
 
-        # Scale → Predict → Inverse-scale
+        # Scale → Predict (NumPy) → Inverse-scale
         input_scaled = scaler_X.transform(input_array)
-        pred_scaled = model.predict(input_scaled, verbose=0)
+        pred_scaled = predict_numpy(weights_data, model_config, input_scaled)
         pred_price = scaler_y.inverse_transform(pred_scaled)[0][0]
 
     # Result
@@ -458,6 +483,7 @@ if predict_clicked:
             st.code(f"Unscaled price: ${pred_price:,.2f}", language=None)
             st.code(f"Features used: {len(features)}", language=None)
             st.code(f"Model params: ~48,131 trainable", language=None)
+            st.code(f"Engine: Pure NumPy (no TF needed)", language=None)
 
 # ── Model Info Section ───────────────────────────────────────────────────────
 st.markdown("<br>", unsafe_allow_html=True)
@@ -476,7 +502,7 @@ with st.expander("🧠 About the Model"):
         **Scaling:** StandardScaler (scikit-learn)  
         **Input Features:** 9  
         **Output:** Close Price (USD)  
-        **Framework:** TensorFlow / Keras  
+        **Inference:** Pure NumPy (lightweight)  
         """)
 
 # ── Footer ───────────────────────────────────────────────────────────────────
