@@ -4,7 +4,7 @@ A Streamlit web app that predicts the **Bitcoin Close Price** using a trained Ar
 
 ## 🚀 Live Demo
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-name.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://x-estal-nitish-bit-coin-price-predictor.streamlit.app/)]
 
 ## 📂 Project Structure
 
